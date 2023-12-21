@@ -1,4 +1,4 @@
-module xp
+module github.com/nronzel/simplefileserver
 
 go 1.21.3
 
