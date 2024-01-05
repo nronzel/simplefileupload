@@ -101,6 +101,15 @@ func (fs *FileServer) listFilesHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func ensureDir(dirName string) {
+	if _, err := os.Stat(dirName); os.IsNotExist(err) {
+		err := os.Mkdir(dirName, os.ModePerm)
+		if err != nil {
+			log.Fatal(err)
+		}
+	}
+}
+
 func main() {
 	uploadPath := "./uploads"
 	ensureDir(uploadPath)
@@ -132,13 +141,4 @@ func main() {
 	}
 
 	log.Println("Server gracefully stopped")
-}
-
-func ensureDir(dirName string) {
-	if _, err := os.Stat(dirName); os.IsNotExist(err) {
-		err := os.Mkdir(dirName, os.ModePerm)
-		if err != nil {
-			log.Fatal(err)
-		}
-	}
 }
