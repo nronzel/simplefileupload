@@ -8,7 +8,7 @@ import (
 	"path/filepath"
 )
 
-func (fs *FileServer) uploadFileHandler(w http.ResponseWriter, r *http.Request) {
+func (fs *FileServer) handlerUpload(w http.ResponseWriter, r *http.Request) {
 	err := r.ParseMultipartForm(fs.MaxUploadSize)
 	if err != nil {
 		log.Printf("Error parsing multipart form: %v", err)

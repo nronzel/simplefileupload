@@ -26,9 +26,9 @@ func newFileServer(uploadPath string) *FileServer {
 		MaxUploadSize: 10 << 20, // 10MB size limit
 	}
 
-	fs.Router.Post("/upload", fs.uploadFileHandler)
-	fs.Router.Get("/files/{fileName}", fs.downloadFileHandler)
-	fs.Router.Get("/files", fs.listFilesHandler)
+	fs.Router.Post("/upload", fs.handlerUpload)
+	fs.Router.Get("/files/{fileName}", fs.handlerDownload)
+	fs.Router.Get("/files", fs.handlerListFiles)
 
 	return fs
 }

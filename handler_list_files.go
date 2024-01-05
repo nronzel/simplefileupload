@@ -6,7 +6,7 @@ import (
 	"os"
 )
 
-func (fs *FileServer) listFilesHandler(w http.ResponseWriter, r *http.Request) {
+func (fs *FileServer) handlerListFiles(w http.ResponseWriter, r *http.Request) {
 	files, err := os.ReadDir(fs.UploadPath)
 	if err != nil {
 		log.Printf("Error reading directory: %v", err)
