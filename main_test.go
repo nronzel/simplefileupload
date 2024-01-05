@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"io"
+	"log"
 	"mime/multipart"
 	"net/http"
 	"net/http/httptest"
@@ -13,7 +14,10 @@ import (
 )
 
 func setupTestServer() (*FileServer, string) {
-	tempDir, _ := os.MkdirTemp("", "testuploads")
+	tempDir, err := os.MkdirTemp("", "testuploads")
+	if err != nil {
+		log.Fatalf("Failed to create temp dir: %v", err)
+	}
 	fileServer := newFileServer(tempDir)
 	return fileServer, tempDir
 }
