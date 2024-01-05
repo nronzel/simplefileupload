@@ -14,7 +14,7 @@ import (
 
 func setupTestServer() (*FileServer, string) {
 	tempDir, _ := os.MkdirTemp("", "testuploads")
-	fileServer := NewFileServer(tempDir)
+	fileServer := newFileServer(tempDir)
 	return fileServer, tempDir
 }
 
