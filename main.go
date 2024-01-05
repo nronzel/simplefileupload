@@ -16,7 +16,7 @@ type FileServer struct {
 	Port       string
 }
 
-func NewFileServer(uploadPath string) *FileServer {
+func newFileServer(uploadPath string) *FileServer {
 	fs := &FileServer{
 		UploadPath: uploadPath,
 		Router:     chi.NewRouter(),
@@ -47,7 +47,7 @@ func (fs *FileServer) uploadFileHandler(w http.ResponseWriter, r *http.Request) 
 	filepath := filepath.Join(fs.UploadPath, handler.Filename)
 	dst, err := os.Create(filepath)
 	if err != nil {
-		http.Error(w, "Error saving the file", http.StatusInternalServerError)
+		http.Error(w, "Error creating file", http.StatusInternalServerError)
 		return
 	}
 	defer dst.Close()
@@ -57,10 +57,7 @@ func (fs *FileServer) uploadFileHandler(w http.ResponseWriter, r *http.Request) 
 		http.Error(w, "Error writing the file", http.StatusInternalServerError)
 	}
 
-	_, err = w.Write([]byte("File uploaded successfully: " + handler.Filename))
-	if err != nil {
-		http.Error(w, "Problem uploading file", http.StatusInternalServerError)
-	}
+	w.Write([]byte("File uploaded successfully: " + handler.Filename))
 }
 
 func (fs *FileServer) downloadFileHandler(w http.ResponseWriter, r *http.Request) {
@@ -90,7 +87,7 @@ func main() {
 	uploadPath := "./uploads"
 	ensureDir(uploadPath)
 
-	fileServer := NewFileServer(uploadPath)
+	fileServer := newFileServer(uploadPath)
 	log.Printf("Server started on localhost%s\n", fileServer.Port)
 	log.Fatal(http.ListenAndServe(fileServer.Port, fileServer.Router))
 }
