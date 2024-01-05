@@ -55,7 +55,7 @@ go run main.go
 
 ### Uploading a File
 
-Use a tool like `curl` to upload a file:
+Use a tool like `curl`, `Postman`, `Insomnia`, etc. to upload a file:
 
 ```bash
 curl -X POST -F "file=@/path/to/file.txt" http://localhost:8888/upload
@@ -80,3 +80,8 @@ To run the included test suite:
 ```bash
 go test -v
 ```
+
+## Contributions
+
+This is meant to serve as a starting point for a fileserver. Feel free to fork
+this repo and add any functionality you may need or want.

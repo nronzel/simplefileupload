@@ -1,26 +1,31 @@
 package main
 
 import (
+	"context"
 	"io"
 	"log"
 	"net/http"
 	"os"
+	"os/signal"
 	"path/filepath"
+	"time"
 
 	"github.com/go-chi/chi/v5"
 )
 
 type FileServer struct {
-	UploadPath string
-	Router     *chi.Mux
-	Port       string
+	UploadPath    string
+	Router        *chi.Mux
+	Port          string
+	MaxUploadSize int64
 }
 
 func newFileServer(uploadPath string) *FileServer {
 	fs := &FileServer{
-		UploadPath: uploadPath,
-		Router:     chi.NewRouter(),
-		Port:       ":8888",
+		UploadPath:    uploadPath,
+		Router:        chi.NewRouter(),
+		Port:          ":8888",
+		MaxUploadSize: 10 << 20, // 10MB size limit
 	}
 
 	fs.Router.Post("/upload", fs.uploadFileHandler)
@@ -31,9 +36,10 @@ func newFileServer(uploadPath string) *FileServer {
 }
 
 func (fs *FileServer) uploadFileHandler(w http.ResponseWriter, r *http.Request) {
-	err := r.ParseMultipartForm(10 << 20) // 10MB size limit
+	err := r.ParseMultipartForm(fs.MaxUploadSize)
 	if err != nil {
-		http.Error(w, "Problem parsing file", http.StatusInternalServerError)
+		log.Printf("Error parsing multipart form: %v", err)
+		http.Error(w, "File too large", http.StatusBadRequest)
 		return
 	}
 
@@ -55,9 +61,13 @@ func (fs *FileServer) uploadFileHandler(w http.ResponseWriter, r *http.Request) 
 	_, err = io.Copy(dst, file)
 	if err != nil {
 		http.Error(w, "Error writing the file", http.StatusInternalServerError)
+		return
 	}
 
-	w.Write([]byte("File uploaded successfully: " + handler.Filename))
+	_, err = w.Write([]byte("File uploaded successfully: " + handler.Filename))
+	if err != nil {
+		http.Error(w, "Error writing response", http.StatusInternalServerError)
+	}
 }
 
 func (fs *FileServer) downloadFileHandler(w http.ResponseWriter, r *http.Request) {
@@ -89,7 +99,31 @@ func main() {
 
 	fileServer := newFileServer(uploadPath)
 	log.Printf("Server started on localhost%s\n", fileServer.Port)
-	log.Fatal(http.ListenAndServe(fileServer.Port, fileServer.Router))
+
+	srv := &http.Server{
+		Addr:    fileServer.Port,
+		Handler: fileServer.Router,
+	}
+
+	go func() {
+		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+			log.Fatalf("listen: %s\n", err)
+		}
+	}()
+
+	// Wait for interrupt signal for graceful shutdown
+	c := make(chan os.Signal, 1)
+	signal.Notify(c, os.Interrupt)
+	<-c
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	if err := srv.Shutdown(ctx); err != nil {
+		log.Fatalf("Server forced to shutdown: %v", err)
+	}
+
+	log.Println("Server gracefully stopped")
 }
 
 func ensureDir(dirName string) {
