@@ -42,7 +42,7 @@ func TestUploadFileHandler(t *testing.T) {
 	fileServer.Router.ServeHTTP(rr, req)
 
 	// Check the response and file creation
-	if status := rr.Code; status != http.StatusOK {
+	if status := rr.Code; status != http.StatusCreated {
 		t.Errorf("handler returned wrong status code: got %v want %v", status, http.StatusOK)
 	}
 
