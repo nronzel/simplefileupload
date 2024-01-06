@@ -47,7 +47,7 @@ func main() {
 	ensureDir(uploadPath)
 
 	fileServer := newFileServer(uploadPath)
-	log.Printf("Server started on localhost%s\n", fileServer.Port)
+    log.Printf("Server started on localhost:%s\n", fileServer.Port)
 
 	srv := &http.Server{
 		Addr:    ":" + fileServer.Port,
