@@ -22,7 +22,7 @@ func newFileServer(uploadPath string) *FileServer {
 	fs := &FileServer{
 		UploadPath:    uploadPath,
 		Router:        chi.NewRouter(),
-		Port:          ":8888",
+		Port:          "8888",
 		MaxUploadSize: 10 << 20, // 10MB size limit
 	}
 
@@ -50,7 +50,7 @@ func main() {
 	log.Printf("Server started on localhost%s\n", fileServer.Port)
 
 	srv := &http.Server{
-		Addr:    fileServer.Port,
+		Addr:    ":" + fileServer.Port,
 		Handler: fileServer.Router,
 	}
 
