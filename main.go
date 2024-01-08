@@ -12,8 +12,9 @@ import (
 )
 
 const (
-	Port      = "8888"
-	MaxUpload = 10 << 20 // 10mb
+	Port       = "8888"
+	MaxUpload  = 10 << 20 // 10mb
+	UploadPath = "./uploads"
 )
 
 type FileServer struct {
@@ -48,10 +49,9 @@ func ensureDir(dirName string) {
 }
 
 func main() {
-	uploadPath := "./uploads"
-	ensureDir(uploadPath)
+	ensureDir(UploadPath)
 
-	fileServer := newFileServer(uploadPath)
+	fileServer := newFileServer(UploadPath)
 	log.Printf("Server started on localhost:%s\n", fileServer.Port)
 
 	srv := &http.Server{
