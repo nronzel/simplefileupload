@@ -11,6 +11,11 @@ import (
 	"github.com/go-chi/chi/v5"
 )
 
+const (
+	Port      = "8888"
+	MaxUpload = 10 << 20 // 10mb
+)
+
 type FileServer struct {
 	UploadPath    string
 	Router        *chi.Mux
@@ -22,8 +27,8 @@ func newFileServer(uploadPath string) *FileServer {
 	fs := &FileServer{
 		UploadPath:    uploadPath,
 		Router:        chi.NewRouter(),
-		Port:          "8888",
-		MaxUploadSize: 10 << 20, // 10MB size limit
+		Port:          Port,
+		MaxUploadSize: MaxUpload,
 	}
 
 	fs.Router.Post("/upload", fs.handlerUpload)
@@ -47,7 +52,7 @@ func main() {
 	ensureDir(uploadPath)
 
 	fileServer := newFileServer(uploadPath)
-    log.Printf("Server started on localhost:%s\n", fileServer.Port)
+	log.Printf("Server started on localhost:%s\n", fileServer.Port)
 
 	srv := &http.Server{
 		Addr:    ":" + fileServer.Port,
